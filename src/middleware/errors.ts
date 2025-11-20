@@ -1,15 +1,17 @@
 import type { NextFunction, Request, Response } from "express";
-import type { HttpException } from "../exceptions/root.ts";
 
 export const errorMiddleware = (
-  error: HttpException,
+  error: any, // <-- was HttpException
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  res.status(error.statusCode).json({
-    message: error.message,
-    erroorCode: error.errorCode,
-    errors: error.errors,
+  const statusCode = error.statusCode || 500;
+  const message = error.message || "Internal Server Error";
+
+  res.status(statusCode).json({
+    message,
+    errorCode: error.errorCode || "INTERNAL_ERROR",
+    errors: error.errors || null,
   });
 };

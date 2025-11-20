@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { login, signup } from "../controllers/auth.ts";
+import { login, me, signup } from "../controllers/auth.ts";
+import { ErrorHandle } from "../error-handler.ts";
+import authMiddleware from "../middleware/auth.ts";
 
 const authRoutes: Router = Router();
 
-authRoutes.post("/signup", signup);
-authRoutes.post("/login", login);
+authRoutes.post("/signup", ErrorHandle(signup));
+authRoutes.post("/login", ErrorHandle(login));
+authRoutes.get("/me", [authMiddleware], ErrorHandle(me));
 
 export default authRoutes;

@@ -7,6 +7,8 @@ export const ErrorCode = {
   USER_ALREADY_EXISTS: 1002,
   INCORRECT_PASSWORD: 1003,
   UNPROCESSABLE_ENTITY: 2001,
+  INTERNAL_EXCEPTION: 3001,
+  UNAUTHORIZED: 4001,
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

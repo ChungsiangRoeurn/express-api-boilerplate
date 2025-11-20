@@ -4,11 +4,19 @@ import { PORT } from "./secrets.ts";
 import rootRouter from "./routes/index.ts";
 import { PrismaClient } from "@prisma/client";
 import { errorMiddleware } from "./middleware/errors.ts";
-import { SignUpSchema } from "./schema/users.ts";
+import path from "path";
 
 const app: Express = express();
 
 app.use(express.json());
+
+// Serve static files
+app.use(express.static(path.join(process.cwd(), "public")));
+
+// This will automatically serve public/index.html for "/"
+app.get("/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
+});
 
 app.use("/api", rootRouter);
 
