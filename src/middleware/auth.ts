@@ -10,13 +10,17 @@ const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  // Accept the token directly from header without 'Bearer '
-  const token = req.headers.authorization; // raw token
-  if (!token) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
     return next(
       new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
     );
   }
+
+  // Accept raw token or "Bearer <token>"
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : authHeader;
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as any;
@@ -24,6 +28,7 @@ const authMiddleware = async (
     const user = await prismaClient.user.findFirst({
       where: { id: payload.userId },
     });
+
     if (!user) {
       return next(
         new UnauthorizedException("Unauthorized", ErrorCode.UNAUTHORIZED)
