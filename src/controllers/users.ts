@@ -6,6 +6,15 @@ import { ErrorCode } from "../exceptions/root.ts";
 import type { Address } from "@prisma/client";
 import { BadRequestsException } from "../exceptions/bad-requests.ts";
 
+const removeUndefined = (obj: any) => {
+  for (const key in obj) {
+    if (obj[key] === undefined) {
+      delete obj[key];
+    }
+  }
+  return obj;
+};
+
 export const addAddress = async (req: Request, res: Response) => {
   AddressSchema.parse(req.body);
 
@@ -84,16 +93,16 @@ export const updateUser = async (req: Request, res: Response) => {
           id: validatorData.defaultShippingAddress,
         },
       });
-      if (shippingAddress.userId != req.user.id) {
-        throw new BadRequestsException(
-          "Address does not belong to user",
-          ErrorCode.ADDRESS_DOES_NOT_BELONG
-        );
-      }
     } catch (error) {
       throw new NotFoundException(
         "Address not found!",
         ErrorCode.HEADER_NOT_FOUND
+      );
+    }
+    if (shippingAddress.userId != req.user.id) {
+      throw new BadRequestsException(
+        "Address does not belong to user",
+        ErrorCode.ADDRESS_DOES_NOT_BELONG
       );
     }
   }
@@ -105,24 +114,25 @@ export const updateUser = async (req: Request, res: Response) => {
           id: validatorData.defaultBillingAddress,
         },
       });
-      if (billingAddress.userId != req.user.id) {
-        throw new BadRequestsException(
-          "Address does not belong to user!",
-          ErrorCode.ADDRESS_DOES_NOT_BELONG
-        );
-      }
     } catch (error) {
       throw new NotFoundException(
         "Address not found!",
         ErrorCode.HEADER_NOT_FOUND
       );
     }
+    if (billingAddress.userId != req.user.id) {
+      throw new BadRequestsException(
+        "Address does not belong to user!",
+        ErrorCode.ADDRESS_DOES_NOT_BELONG
+      );
+    }
   }
+
+  const data = removeUndefined(validatorData);
 
   const updateUser = await prismaClient.user.update({
     where: { id: req.user.id },
-    data: validatorData,
+    data,
   });
-
   res.json(updateUser);
 };
