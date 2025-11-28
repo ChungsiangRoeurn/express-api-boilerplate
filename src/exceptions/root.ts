@@ -11,6 +11,7 @@ export const ErrorCode = {
   HEADER_NOT_FOUND: 1004,
   ADDRESS_DOES_NOT_BELONG: 1005,
   UNAUTHORIZED: 4001,
+  PRODUCT_NOT_FOUND: 5001,
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
